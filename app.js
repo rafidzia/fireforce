@@ -41,22 +41,22 @@ app.get("/", (req, res) => {
 
 ee.on("aedes_/FireSmokeDetected", (dataMap) => {
     let data = dataMap.split(";")             // contoh format data Long,Lat;C1;F1;R1 (Client 1 Floor 1 Room 1)
-    io.emit("/user/FireSmoke/" + data[0], data[1] + ";" + data[2])
+    io.emit("/user/FireSmokeDetected/" + data[1], data[2] + ";" + data[3])
 })
 
 ee.on("aedes_/SmokeDetected", (dataMap) => {
-    let data = dataMap.split(";")             // contoh format data Long,Lat;C1;F1;R1 (Client 1 Floor 1 Room 1)
-    // io.emit("/sApiFloor/" + data[0], data[1] + ";" + data[2])
+    let data = dataMap.split(";")             // contoh format data C1;F1;R1 (Client 1 Floor 1 Room 1)
+    io.emit("/user/SmokeDetected/" + data[0], data[1] + ";" + data[2])
 })
 
 ee.on("aedes_/FireDetected", (dataMap) => {
-    let data = dataMap.split(";")             // contoh format data Long,Lat;C1;F1;R1 (Client 1 Floor 1 Room 1)
-    // io.emit("/sApiFloor/" + data[0], data[1] + ";" + data[2])
+    let data = dataMap.split(";")             // contoh format data C1;F1;R1 (Client 1 Floor 1 Room 1)
+    io.emit("/user/FireDetected/" + data[0], data[1] + ";" + data[2])
 })
 
 ee.on("aedes_/NoDetected", (dataMap) => {
-    let data = dataMap.split(";")             // contoh format data Long,Lat;C1;F1;R1 (Client 1 Floor 1 Room 1)
-    // io.emit("/sApiFloor/" + data[0], data[1] + ";" + data[2])
+    let data = dataMap.split(";")             // contoh format data C1;F1;R1 (Client 1 Floor 1 Room 1)
+    io.emit("/user/NoDetected/" + data[0], data[1] + ";" + data[2])
 })
 
 
