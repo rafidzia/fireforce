@@ -2,9 +2,11 @@ const express = require('express')
 const { EventEmitter } = require('events')
 const ee = new EventEmitter();
 const app = express()
-const server = require("http").Server(app)
-const io = require('socket.io')(server, {cors: {origin: "*"}})
 const port = 8001;
+const server = app.listen(process.env.PORT || port, function(){
+    console.log('server started and listening on port ', port)
+});
+const io = require('socket.io')(server, {cors: {origin: "*"}})
 const aedes = require('aedes')()
 const mqttserver = require('net').createServer(aedes.handle)
 const netport = 1883
@@ -63,7 +65,3 @@ ee.on("aedes_/NoDetected", (dataMap) => {
 io.on('connection', function (socket) {
     
 })
-
-server.listen(process.env.PORT || port, function(){
-    console.log('server started and listening on port ', port)
-});
