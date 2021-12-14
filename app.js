@@ -6,7 +6,7 @@ const port = 8001;
 const server = app.listen(process.env.PORT || port, function(){
     console.log('server started and listening on port ', port)
 });
-// const io = require('socket.io')(server, {cors: {origin: "*"}})
+const io = require('socket.io')(server, {cors: {origin: "*"}})
 const aedes = require('aedes')()
 const mqttserver = require('net').createServer(aedes.handle)
 const netport = 1883
@@ -46,7 +46,7 @@ app.get("/", (req, res) => {
 
 ee.on("aedes_/FireSmokeDetected", (dataMap) => {
     let data = dataMap.split(";")             // contoh format data Long,Lat;C1;F1;R1 (Client 1 Floor 1 Room 1)
-    // io.emit("/user/FireSmokeDetected/" + data[1], data[2] + ";" + data[3])
+    io.emit("/user/FireSmokeDetected/" + data[1], data[2] + ";" + data[3])
     fcm.send("/topics/FireSmokeDetected-" + data[1], {floor : data[2], room : data[3]}, (err, data)=>{
         console.log(err, data)
     })
@@ -54,27 +54,27 @@ ee.on("aedes_/FireSmokeDetected", (dataMap) => {
 
 ee.on("aedes_/SmokeDetected", (dataMap) => {
     let data = dataMap.split(";")             // contoh format data C1;F1;R1 (Client 1 Floor 1 Room 1)
-    // io.emit("/user/SmokeDetected/" + data[0], data[1] + ";" + data[2])
-    fcm.send("/topics/SmokeDetected-" + data[0], {floor : data[1], room : data[2]})
+    io.emit("/user/SmokeDetected/" + data[0], data[1] + ";" + data[2])
+    // fcm.send("/topics/SmokeDetected-" + data[0], {floor : data[1], room : data[2]})
 })
 
 ee.on("aedes_/FireDetected", (dataMap) => {
     let data = dataMap.split(";")             // contoh format data C1;F1;R1 (Client 1 Floor 1 Room 1)
-    // io.emit("/user/FireDetected/" + data[0], data[1] + ";" + data[2])
-    fcm.send("/topics/FireDetected-" + data[0], {floor : data[1], room : data[2]})
+    io.emit("/user/FireDetected/" + data[0], data[1] + ";" + data[2])
+    // fcm.send("/topics/FireDetected-" + data[0], {floor : data[1], room : data[2]})
 })
 
 ee.on("aedes_/NoDetected", (dataMap) => {
     let data = dataMap.split(";")             // contoh format data C1;F1;R1 (Client 1 Floor 1 Room 1)
-    // io.emit("/user/NoDetected/" + data[0], data[1] + ";" + data[2])
-    fcm.send("/topics/NoDetected-" + data[0], {floor : data[1], room : data[2]})
+    io.emit("/user/NoDetected/" + data[0], data[1] + ";" + data[2])
+    // fcm.send("/topics/NoDetected-" + data[0], {floor : data[1], room : data[2]})
 })
 
 
-// io.on('connection', function (socket) {
-//     console.log('a user connected');
-//     socket.on('disconnect', function () {
-//         console.log('user disconnected');
-//     });
-// })
+io.on('connection', function (socket) {
+    console.log('a user connected');
+    socket.on('disconnect', function () {
+        console.log('user disconnected');
+    });
+})
 
