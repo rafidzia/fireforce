@@ -35,4 +35,4 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Restart server
-        run: pm2 restart fireforce
+        run: /root/.nvm/versions/node/v17.2.0/bin/pm2 restart fireforce
