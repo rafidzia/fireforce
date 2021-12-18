@@ -82,5 +82,6 @@ io.on('connection', function (socket) {
         console.log("dsa");
         io.emit("asd", data)
     })
+    socket.on("ntol", ()=>{})
 })
 
