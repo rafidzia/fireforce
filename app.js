@@ -79,6 +79,7 @@ io.on('connection', function (socket) {
 
 
     socket.on("dsa", (data)=>{
+        console.log("dsa");
         socket.emit("asd", data)
     })
 })
