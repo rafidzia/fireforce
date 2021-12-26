@@ -88,17 +88,20 @@ ee.on("aedes_/NoDetected", (dataMap) => {
 io.on('connection', function (socket) {
     console.log('a user connected');
     socket.emit("connected");
-
     socket.on('disconnect', function () {
         console.log('user disconnected');
     });
+
+    socket.on("enteringApp", () => {
+        socket.emit("connected")
+    })
 
     socket.on("userFindPlace", (data) => {
         
     })
 
     socket.on("userSearchPlace", (data) => {
-        // console.log(data.options)
+
         socket.emit("userSearchPlaceResult", {data : ["place1", "place2", "place3", "place4", "place5"]})
     })
 
