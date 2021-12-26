@@ -1,3 +1,5 @@
+
+const crypto = require('crypto')
 const express = require('express')
 const { EventEmitter } = require('events')
 const ee = new EventEmitter();
