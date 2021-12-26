@@ -98,7 +98,8 @@ io.on('connection', function (socket) {
     })
 
     socket.on("userSearchPlace", (data) => {
-        console.log(data.options)
+        // console.log(data.options)
+        socket.emit("userSearchPlaceResult", {data : ["place1", "place2", "place3"]})
     })
 
 
