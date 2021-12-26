@@ -1,5 +1,5 @@
 /**
- * @param {String} topic - The date
+ * @param {String} topicOrToken - The string topic name or the device token.
  * @param {string} data - The string
  */
 

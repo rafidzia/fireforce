@@ -11,7 +11,20 @@ const aedes = require('aedes')()
 const mqttserver = require('net').createServer(aedes.handle)
 const netport = 1883
 
+const MongoClient = require("mongodb").MongoClient;
+const mongoURL = "mongodb://localhost:27017/";
+const mongoOptions = {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+}
+var db;
+
 var fcm = require("./fcm")
+
+MongoClient.connect(mongoURL, mongoOptions, (err, client)=>{
+    if(err) throw err;
+    db = client.db("fireforce")
+})
 
 
 mqttserver.listen(netport, function () {
@@ -35,9 +48,9 @@ var publish = (topic, message)=>{
     })
 }
 
-setTimeout(() => {
-    publish("test", "test")
-}, 1000)
+// setTimeout(() => {
+//     publish("test", "test")
+// }, 1000)
 
 
 app.get("/", (req, res) => {
@@ -74,9 +87,14 @@ ee.on("aedes_/NoDetected", (dataMap) => {
 io.on('connection', function (socket) {
     console.log('a user connected');
     socket.emit("connected");
+
     socket.on('disconnect', function () {
         console.log('user disconnected');
     });
+
+    socket.on("userFindPlace", (data) => {
+        
+    })
 
 
     socket.on("dsa", (data)=>{
