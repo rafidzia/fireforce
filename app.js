@@ -98,7 +98,7 @@ io.on('connection', function (socket) {
     })
 
     socket.on("userSearchPlace", (data) => {
-        console.log(data)
+        console.log(data.options)
     })
 
 
