@@ -60,17 +60,19 @@ app.get("/", (req, res) => {
     res.send("asd")
 })
 
+// {"floor" : data[1].substring(1, data[1].length - 1), "room" : result[data[1]][data[2]][1]}
+
 ee.on("aedes_/FireSmokeDetected", (dataMap) => {
     let data = dataMap.split(";")             // contoh format data Long,Lat;C1;F1;R1 (Client 1 Floor 1 Room 1)
-    db.collection("user").updateOne({id : data[0]}, {$set : {status: 3}}, (err, result)=>{
+    let dataupdate = {}
+    dataupdate.$set = {}
+    dataupdate.$set[`${data[1]}.${data[2]}.0`] = 3
+    db.collection("user").updateOne({id : data[0]}, dataupdate, (err, result)=>{
         if(err) throw err;
     })
-    db.collection("user").findOne({id : data[0]}, (err, result)=>{
-        if(err) throw err;
-        if(result){
-            io.emit("/user/FireSmokeDetected/" + data[0], {"floor" : data[1].substring(1, data[1].length - 1), "room" : result[data[1]][data[2]]})
-        }
-    })
+    io.emit("userConditionChange" + data[0]);
+
+    // io.emit("/user/FireSmokeDetected/" + data[0]);
     fcm.send("/topics/FireSmokeDetected-" + data[1], {floor : data[2], room : data[3]}, (err, data)=>{
         console.log(err, data)
     })
@@ -78,43 +80,43 @@ ee.on("aedes_/FireSmokeDetected", (dataMap) => {
 
 ee.on("aedes_/SmokeDetected", (dataMap) => {
     let data = dataMap.split(";")             // contoh format data C1;F1;R1 (Client 1 Floor 1 Room 1)
-    db.collection("user").updateOne({id : data[0]}, {$set : {status: 2}}, (err, result)=>{
+    let dataupdate = {}
+    dataupdate.$set = {}
+    dataupdate.$set[`${data[1]}.${data[2]}.0`] = 2
+    db.collection("user").updateOne({id : data[0]}, dataupdate, (err, result)=>{
         if(err) throw err;
     })
-    db.collection("user").findOne({id : data[0]}, (err, result)=>{
-        if(err) throw err;
-        if(result){
-            io.emit("/user/SmokeDetected/" + data[0], {"floor" : data[1].substring(1, data[1].length - 1), "room" : result[data[1]][data[2]]})
-        }
-    })
+    io.emit("userConditionChange" + data[0]);
+    // io.emit("/user/SmokeDetected/" + data[0]);
     // fcm.send("/topics/SmokeDetected-" + data[0], {floor : data[1], room : data[2]})
 })
 
 ee.on("aedes_/FireDetected", (dataMap) => {
     let data = dataMap.split(";")             // contoh format data C1;F1;R1 (Client 1 Floor 1 Room 1)
-    db.collection("user").updateOne({id : data[0]}, {$set : {status: 1}}, (err, result)=>{
+    let dataupdate = {}
+    dataupdate.$set = {}
+    dataupdate.$set[`${data[1]}.${data[2]}.0`] = 1
+    db.collection("user").updateOne({id : data[0]}, dataupdate, (err, result)=>{
         if(err) throw err;
     })
-    db.collection("user").findOne({id : data[0]}, (err, result)=>{
-        if(err) throw err;
-        if(result){
-            io.emit("/user/FireDetected/" + data[0], {"floor" : data[1].substring(1, data[1].length - 1), "room" : result[data[1]][data[2]]})
-        }
-    })
+    io.emit("userConditionChange" + data[0]);
+
+    // io.emit("/user/FireDetected/" + data[0]);
+
     // fcm.send("/topics/FireDetected-" + data[0], {floor : data[1], room : data[2]})
 })
 
 ee.on("aedes_/NoDetected", (dataMap) => {
     let data = dataMap.split(";")             // contoh format data C1;F1;R1 (Client 1 Floor 1 Room 1)
-    db.collection("user").updateOne({id : data[0]}, {$set : {status: 0}}, (err, result)=>{
+    let dataupdate = {}
+    dataupdate.$set = {}
+    dataupdate.$set[`${data[1]}.${data[2]}.0`] = 0
+    db.collection("user").updateOne({id : data[0]}, dataupdate, (err, result)=>{
         if(err) throw err;
     })
-    db.collection("user").findOne({id : data[0]}, (err, result)=>{
-        if(err) throw err;
-        if(result){
-            io.emit("/user/NoDetected/" + data[0], {"floor" : data[1].substring(1, data[1].length - 1), "room" : result[data[1]][data[2]]})
-        }
-    })
+    io.emit("userConditionChange" + data[0]);
+
+    // io.emit("/user/NoDetected/" + data[0]);
     
     // fcm.send("/topics/NoDetected-" + data[0], {floor : data[1], room : data[2]})
 })
@@ -148,7 +150,21 @@ io.on('connection', function (socket) {
     })
 
     socket.on("userRequestStatus", (data)=>{
-        
+        data.token = crypto.createHash('sha256').update(data.token).digest('hex');
+        db.collection(data.option).find({"id" : data.id, "token" : data.token}).toArray((err, result)=>{
+            if(err) throw err;
+            if(result.length == 0) return;
+            let data = result[0];
+            let records = []
+            for(let key in data){
+                if(key.substring(0, 1) == "F"){
+                    for(let key1 in data[key]){
+                        records.push(data[key][key1][0])
+                    }
+                }
+            }
+            socket.emit("userStatusResult", records)
+        })
     })
     
 
