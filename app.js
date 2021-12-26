@@ -100,10 +100,10 @@ io.on('connection', function (socket) {
     })
 
     socket.on("userSearchPlace",  (data) => {
-    db.collection(data.option).find({"name" : {"$regex" : data.place, "$options" : "i"}}).toArray((err, result)=>{
+    db.collection(data.option).find({"name" : {"$regex" : data.place, "$options" : "i"}}, {"name" : 1}).toArray((err, result)=>{
             if(err) throw err;
-            console.log(result)
-            socket.emit("userSearchPlaceResult", {"data" : ["place1", "place2", "place3", "place4", "place5"]})
+            result = result.map((item)=>{return item.name; })
+            socket.emit("userSearchPlaceResult", {"data" : result})
         })
         
     })
