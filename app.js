@@ -83,8 +83,8 @@ ee.on("aedes_/FireDetected", (dataMap) => {
 ee.on("aedes_/NoDetected", (dataMap) => {
     let data = dataMap.split(";")             // contoh format data C1;F1;R1 (Client 1 Floor 1 Room 1)
     db.collection("user").findOne({id : data[0]}, (err, result)=>{
-        console.log(result)
-        // io.emit("/user/NoDetected/" + result.name, {"floor" : data[1].substring(1, data[1].length - 1), "room" : result[data[1]][data[2]]})
+        if(err) throw err;
+        io.emit("/user/NoDetected/" + result.name, {"floor" : data[1].substring(1, data[1].length - 1), "room" : result[data[1]][data[2]]})
     })
     
     // fcm.send("/topics/NoDetected-" + data[0], {floor : data[1], room : data[2]})
