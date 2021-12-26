@@ -62,7 +62,15 @@ app.get("/", (req, res) => {
 
 ee.on("aedes_/FireSmokeDetected", (dataMap) => {
     let data = dataMap.split(";")             // contoh format data Long,Lat;C1;F1;R1 (Client 1 Floor 1 Room 1)
-    io.emit("/user/FireSmokeDetected/" + data[1], data[2] + ";" + data[3])
+    db.collection("user").updateOne({id : data[0]}, {$set : {status: 3}}, (err, result)=>{
+        if(err) throw err;
+    })
+    db.collection("user").findOne({id : data[0]}, (err, result)=>{
+        if(err) throw err;
+        if(result){
+            io.emit("/user/FireSmokeDetected/" + data[0], {"floor" : data[1].substring(1, data[1].length - 1), "room" : result[data[1]][data[2]]})
+        }
+    })
     fcm.send("/topics/FireSmokeDetected-" + data[1], {floor : data[2], room : data[3]}, (err, data)=>{
         console.log(err, data)
     })
@@ -70,21 +78,42 @@ ee.on("aedes_/FireSmokeDetected", (dataMap) => {
 
 ee.on("aedes_/SmokeDetected", (dataMap) => {
     let data = dataMap.split(";")             // contoh format data C1;F1;R1 (Client 1 Floor 1 Room 1)
-    io.emit("/user/SmokeDetected/" + data[0], data[1] + ";" + data[2])
+    db.collection("user").updateOne({id : data[0]}, {$set : {status: 2}}, (err, result)=>{
+        if(err) throw err;
+    })
+    db.collection("user").findOne({id : data[0]}, (err, result)=>{
+        if(err) throw err;
+        if(result){
+            io.emit("/user/SmokeDetected/" + data[0], {"floor" : data[1].substring(1, data[1].length - 1), "room" : result[data[1]][data[2]]})
+        }
+    })
     // fcm.send("/topics/SmokeDetected-" + data[0], {floor : data[1], room : data[2]})
 })
 
 ee.on("aedes_/FireDetected", (dataMap) => {
     let data = dataMap.split(";")             // contoh format data C1;F1;R1 (Client 1 Floor 1 Room 1)
-    io.emit("/user/FireDetected/" + data[0], data[1] + ";" + data[2])
+    db.collection("user").updateOne({id : data[0]}, {$set : {status: 1}}, (err, result)=>{
+        if(err) throw err;
+    })
+    db.collection("user").findOne({id : data[0]}, (err, result)=>{
+        if(err) throw err;
+        if(result){
+            io.emit("/user/FireDetected/" + data[0], {"floor" : data[1].substring(1, data[1].length - 1), "room" : result[data[1]][data[2]]})
+        }
+    })
     // fcm.send("/topics/FireDetected-" + data[0], {floor : data[1], room : data[2]})
 })
 
 ee.on("aedes_/NoDetected", (dataMap) => {
     let data = dataMap.split(";")             // contoh format data C1;F1;R1 (Client 1 Floor 1 Room 1)
+    db.collection("user").updateOne({id : data[0]}, {$set : {status: 0}}, (err, result)=>{
+        if(err) throw err;
+    })
     db.collection("user").findOne({id : data[0]}, (err, result)=>{
         if(err) throw err;
-        io.emit("/user/NoDetected/" + result.name, {"floor" : data[1].substring(1, data[1].length - 1), "room" : result[data[1]][data[2]]})
+        if(result){
+            io.emit("/user/NoDetected/" + data[0], {"floor" : data[1].substring(1, data[1].length - 1), "room" : result[data[1]][data[2]]})
+        }
     })
     
     // fcm.send("/topics/NoDetected-" + data[0], {floor : data[1], room : data[2]})
@@ -105,8 +134,8 @@ io.on('connection', function (socket) {
         data.token = crypto.createHash('sha256').update(data.token).digest('hex');
         db.collection(data.option).find({"name" : data.name, "token" : data.token}, {"name" : 1}).toArray((err, result)=>{
             if(err) throw err;
-            if(result.length > 0) socket.emit("userFindPlaceResult", {"status" : true})
-            else socket.emit("userFindPlaceResult", {"status" : false})
+            if(result.length > 0) socket.emit("userFindPlaceResult", {"status" : true, "id" : result[0].id})
+            else socket.emit("userFindPlaceResult", {"status" : false, "id" : ""})
         })
     })
 
@@ -116,6 +145,10 @@ io.on('connection', function (socket) {
             result = result.map((item)=>{return item.name; })
             socket.emit("userSearchPlaceResult", {"data" : result})
         })
+    })
+
+    socket.on("userRequestStatus", (data)=>{
+        
     })
     
 
