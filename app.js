@@ -100,8 +100,7 @@ io.on('connection', function (socket) {
     })
 
     socket.on("userSearchPlace",  (data) => {
-        // console.log(data.option)
-        db.collection("user").find({"name" : "/.*" + data.place + ".*/"}, (err, result)=>{
+        db.collection(data.option).find({"name" : "/.*" + data.place + ".*/"}, {}, (err, result)=>{
             if(err) throw err;
             console.log(result)
         })
