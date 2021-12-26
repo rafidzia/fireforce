@@ -23,6 +23,7 @@ var fcm = require("./fcm")
 
 MongoClient.connect(mongoURL, mongoOptions, (err, client)=>{
     if(err) throw err;
+    console.log("database connected")
     db = client.db("fireforce")
 })
 
