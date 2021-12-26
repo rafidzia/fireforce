@@ -69,8 +69,8 @@ ee.on("aedes_/FireSmokeDetected", (dataMap) => {
     dataupdate.$set[`${data[1]}.${data[2]}.0`] = 3
     db.collection("user").updateOne({id : data[0]}, dataupdate, (err, result)=>{
         if(err) throw err;
+        io.emit("userConditionChange" + data[0]);
     })
-    io.emit("userConditionChange" + data[0]);
 
     // io.emit("/user/FireSmokeDetected/" + data[0]);
     fcm.send("/topics/FireSmokeDetected-" + data[1], {floor : data[2], room : data[3]}, (err, data)=>{
@@ -85,8 +85,8 @@ ee.on("aedes_/SmokeDetected", (dataMap) => {
     dataupdate.$set[`${data[1]}.${data[2]}.0`] = 2
     db.collection("user").updateOne({id : data[0]}, dataupdate, (err, result)=>{
         if(err) throw err;
+        io.emit("userConditionChange" + data[0]);
     })
-    io.emit("userConditionChange" + data[0]);
     // io.emit("/user/SmokeDetected/" + data[0]);
     // fcm.send("/topics/SmokeDetected-" + data[0], {floor : data[1], room : data[2]})
 })
@@ -98,8 +98,8 @@ ee.on("aedes_/FireDetected", (dataMap) => {
     dataupdate.$set[`${data[1]}.${data[2]}.0`] = 1
     db.collection("user").updateOne({id : data[0]}, dataupdate, (err, result)=>{
         if(err) throw err;
+        io.emit("userConditionChange" + data[0]);
     })
-    io.emit("userConditionChange" + data[0]);
 
     // io.emit("/user/FireDetected/" + data[0]);
 
@@ -113,8 +113,8 @@ ee.on("aedes_/NoDetected", (dataMap) => {
     dataupdate.$set[`${data[1]}.${data[2]}.0`] = 0
     db.collection("user").updateOne({id : data[0]}, dataupdate, (err, result)=>{
         if(err) throw err;
+        io.emit("userConditionChange" + data[0]);
     })
-    io.emit("userConditionChange" + data[0]);
 
     // io.emit("/user/NoDetected/" + data[0]);
     
