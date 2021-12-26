@@ -99,8 +99,9 @@ io.on('connection', function (socket) {
         
     })
 
-    socket.on("userSearchPlace", (data) => {
-
+    socket.on("userSearchPlace", async (data) => {
+        let result = await db.collection(data.option).find({"name" : "/.*" + data.search + ".*/"})
+        console.log(result)
         socket.emit("userSearchPlaceResult", {data : ["place1", "place2", "place3", "place4", "place5"]})
     })
 
