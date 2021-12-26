@@ -82,7 +82,10 @@ ee.on("aedes_/FireDetected", (dataMap) => {
 
 ee.on("aedes_/NoDetected", (dataMap) => {
     let data = dataMap.split(";")             // contoh format data C1;F1;R1 (Client 1 Floor 1 Room 1)
-    io.emit("/user/NoDetected/" + data[0], data[1] + ";" + data[2])
+    db.collection("user").findOne({id : data[0]}, (err, result)=>{
+        io.emit("/user/NoDetected/" + result.name, {"floor" : data[1].substring(1, data[1].length - 1), "room" : result[data[1]][data[2]]})
+    })
+    
     // fcm.send("/topics/NoDetected-" + data[0], {floor : data[1], room : data[2]})
 })
 
@@ -113,16 +116,6 @@ io.on('connection', function (socket) {
             socket.emit("userSearchPlaceResult", {"data" : result})
         })
     })
-
-    // socket.on("userPlaceInput", (data)=>{
-    //     data.token = crypto.createHash('sha256').update(data.token).digest('hex');
-    //     db.collection(data.option).find({"name" : data.name, "token" : data.token}, {"name" : 1}).toArray((err, result)=>{
-    //         if(err) throw err;
-    //         if(result.length > 0) socket.emit("userPlaceInputResult", {"status" : true})
-    //         else socket.emit("userPlaceInputResult", {"status" : false})
-    //     })
-    // })
-
     
 
 
