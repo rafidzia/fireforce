@@ -97,6 +97,10 @@ io.on('connection', function (socket) {
         
     })
 
+    socket.on("userSearchPlace", (data) => {
+        console.log(data)
+    })
+
 
     socket.on("dsa", (data)=>{
         console.log("dsa");
