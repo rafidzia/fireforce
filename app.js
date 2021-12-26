@@ -87,7 +87,6 @@ ee.on("aedes_/NoDetected", (dataMap) => {
 
 io.on('connection', function (socket) {
     console.log('a user connected');
-    socket.emit("connected");
     socket.on('disconnect', function () {
         console.log('user disconnected');
     });
