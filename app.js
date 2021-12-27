@@ -71,6 +71,7 @@ ee.on("aedes_/FireSmokeDetected", (dataMap) => {
         if(err) throw err;
         io.emit("userConditionChange" + data[0]);
     })
+    ee.emit("detailChanged", {id : data[0]})
 
     // io.emit("/user/FireSmokeDetected/" + data[0]);
     fcm.send("/topics/FireSmokeDetected-" + data[0], {floor : data[1], room : data[2]}, false, (err, data)=>{
@@ -80,7 +81,7 @@ ee.on("aedes_/FireSmokeDetected", (dataMap) => {
     db.collection("user").findOne({id : data[0]}, (err, result)=>{
         if(err) throw err;
         if(!result.name) return;
-        
+
         fcm.send("/topics/FireSmokeDetected-T1", {place : result.name}, false, (err, data)=>{
             console.log(err, data)
         })
@@ -97,6 +98,7 @@ ee.on("aedes_/SmokeDetected", (dataMap) => {
         if(err) throw err;
         io.emit("userConditionChange" + data[0]);
     })
+    ee.emit("detailChanged", {id : data[0]})
     // io.emit("/user/SmokeDetected/" + data[0]);
     fcm.send("/topics/SmokeDetected-" + data[0], false, {"title" : "Terdeteksi Asap", "body" : "Lantai " + data[1] + " Ruang " + data[2]})
 })
@@ -110,7 +112,7 @@ ee.on("aedes_/FireDetected", (dataMap) => {
         if(err) throw err;
         io.emit("userConditionChange" + data[0]);
     })
-
+    ee.emit("detailChanged", {id : data[0]})
     // io.emit("/user/FireDetected/" + data[0]);
 
     fcm.send("/topics/FireDetected-" + data[0], false, {"title" : "Terdeteksi Api", "body" : "Lantai " + data[1] + " Ruang " + data[2]})
@@ -126,6 +128,7 @@ ee.on("aedes_/NoDetected", (dataMap) => {
         io.emit("userConditionChange" + data[0]);
     })
 
+    ee.emit("detailChanged", {id : data[0]})
     // io.emit("/user/NoDetected/" + data[0]);
     
     // fcm.send("/topics/NoDetected-" + data[0], {floor : data[1], room : data[2]})
@@ -193,31 +196,20 @@ io.on('connection', function (socket) {
     
     socket.on("userRequestDetail", (data)=>{
         data.token = crypto.createHash('sha256').update(data.token).digest('hex');
-        db.collection("user").find({"id" : data.id, "token" : data.token}).toArray((err, result)=>{
-            if(err) throw err;
-            if(result.length == 0) return;
-            result = result[0];
-            let records = []
-            for(let key in result){
-                if(key.substring(0, 1) == "F"){
-                    let tmpData = {}
-                    tmpData.name = key;
-                    tmpData.data = []
-                    for(let key1 in result[key]){
-                        tmpData.data.push(result[key][key1])
-                    }
-                    records.push(tmpData)
-                }
-            }
-            socket.emit("userDetailResult", records)
-        })
-        // socket.
+        ee.emit("detailChanged", data)
 
     })
 
     socket.on("userSearchByFloorRoom", (data)=>{
         data.token = crypto.createHash('sha256').update(data.token).digest('hex');
-        db.collection("user").find({"id" : data.id, "token" : data.token}).toArray((err, result)=>{
+        
+    })
+
+    ee.on("detailChanged", (data)=>{
+        let checkData = {}
+        checkData.id = data.id
+        if(data.token) checkData.token = data.token
+        db.collection("user").find(checkData).toArray((err, result)=>{
             if(err) throw err;
             if(result.length == 0) return;
             result = result[0];
@@ -244,4 +236,5 @@ io.on('connection', function (socket) {
         io.emit("asd", data)
     })
 })
+
 
