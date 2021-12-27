@@ -199,7 +199,7 @@ io.on('connection', function (socket) {
                     records.push(tmpData)
                 }
             }
-            console.log(records);
+            console.log(records[0].data);
             socket.emit("userDetailResult", records)
         })
 
