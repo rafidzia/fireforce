@@ -132,20 +132,20 @@ io.on('connection', function (socket) {
         socket.emit("connected")
     })
 
-    socket.on("userFindPlace", (data) => {
+    socket.on("findPlace", (data) => {
         data.token = crypto.createHash('sha256').update(data.token).digest('hex');
         db.collection(data.option).find({"name" : data.name, "token" : data.token}, {"name" : 1}).toArray((err, result)=>{
             if(err) throw err;
             if(result.length > 0) socket.emit("userFindPlaceResult", {"status" : true, "id" : result[0].id})
-            else socket.emit("userFindPlaceResult", {"status" : false, "id" : ""})
+            else socket.emit("findPlaceResult", {"status" : false, "id" : ""})
         })
     })
 
-    socket.on("userSearchPlace",  (data) => {
+    socket.on("searchPlace",  (data) => {
         db.collection(data.option).find({"name" : {"$regex" : data.place, "$options" : "i"}}, {"name" : 1}).toArray((err, result)=>{
             if(err) throw err;
             result = result.map((item)=>{return item.name; })
-            socket.emit("userSearchPlaceResult", {"data" : result})
+            socket.emit("searchPlaceResult", {"data" : result})
         })
     })
 
