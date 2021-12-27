@@ -136,7 +136,7 @@ io.on('connection', function (socket) {
         data.token = crypto.createHash('sha256').update(data.token).digest('hex');
         db.collection(data.option).find({"name" : data.name, "token" : data.token}, {"name" : 1}).toArray((err, result)=>{
             if(err) throw err;
-            if(result.length > 0) socket.emit("userFindPlaceResult", {"status" : true, "id" : result[0].id})
+            if(result.length > 0) socket.emit("findPlaceResult", {"status" : true, "id" : result[0].id})
             else socket.emit("findPlaceResult", {"status" : false, "id" : ""})
         })
     })
