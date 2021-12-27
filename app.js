@@ -76,6 +76,16 @@ ee.on("aedes_/FireSmokeDetected", (dataMap) => {
     fcm.send("/topics/FireSmokeDetected-" + data[0], {floor : data[1], room : data[2]}, false, (err, data)=>{
         console.log(err, data)
     })
+
+    db.collection("user").findOne({id : data[0]}, (err, result)=>{
+        if(err) throw err;
+        if(!result.name) return;
+        
+        fcm.send("/topics/FireSmokeDetected-T1", {place : result.name}, false, (err, data)=>{
+            console.log(err, data)
+        })
+        
+    })
 })
 
 ee.on("aedes_/SmokeDetected", (dataMap) => {
@@ -88,7 +98,7 @@ ee.on("aedes_/SmokeDetected", (dataMap) => {
         io.emit("userConditionChange" + data[0]);
     })
     // io.emit("/user/SmokeDetected/" + data[0]);
-    // fcm.send("/topics/SmokeDetected-" + data[0], {floor : data[1], room : data[2]})
+    fcm.send("/topics/SmokeDetected-" + data[0], false, {"title" : "Terdeteksi Asap", "body" : "Lantai " + data[1] + " Ruang " + data[2]})
 })
 
 ee.on("aedes_/FireDetected", (dataMap) => {
@@ -103,7 +113,7 @@ ee.on("aedes_/FireDetected", (dataMap) => {
 
     // io.emit("/user/FireDetected/" + data[0]);
 
-    // fcm.send("/topics/FireDetected-" + data[0], {floor : data[1], room : data[2]})
+    fcm.send("/topics/FireDetected-" + data[0], false, {"title" : "Terdeteksi Api", "body" : "Lantai " + data[1] + " Ruang " + data[2]})
 })
 
 ee.on("aedes_/NoDetected", (dataMap) => {
