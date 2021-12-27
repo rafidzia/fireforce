@@ -172,7 +172,7 @@ io.on('connection', function (socket) {
         db.collection("fireman").find({"id" : data.id, "token" : data.token}).toArray((err, result)=>{
             if(err) throw err;
             if(result.length == 0) return;
-            let result = result[0];
+            result = result[0];
             if(result.demand != "-"){
                 socket.emit("firemanStatusResult", {"status" : true})
             }else{
