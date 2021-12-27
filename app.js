@@ -181,6 +181,29 @@ io.on('connection', function (socket) {
         })
     })
     
+    socket.on("userRequestDetail", (data)=>{
+        data.token = crypto.createHash('sha256').update(data.token).digest('hex');
+        db.collection("user").find({"id" : data.id, "token" : data.token}).toArray((err, result)=>{
+            if(err) throw err;
+            if(result.length == 0) return;
+            result = result[0];
+            let records = []
+            for(let key in result){
+                if(key.substring(0, 1) == "F"){
+                    let tmpData = {}
+                    tmpData.name = key;
+                    tmpData.data = []
+                    for(let key1 in result[key]){
+                        tmpData.data.push(result[key][key1])
+                    }
+                    records.push(tmpData)
+                }
+            }
+            console.log(records)
+        })
+
+    })
+
 
 
     socket.on("dsa", (data)=>{
