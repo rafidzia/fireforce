@@ -194,10 +194,7 @@ io.on('connection', function (socket) {
                     tmpData.name = key;
                     tmpData.data = []
                     for(let key1 in result[key]){
-                        tmpData.data.push({
-                            status : result[key][key1][0],
-                            name : result[key][key1][1]
-                        })
+                        tmpData.data.push(result[key][key1])
                     }
                     records.push(tmpData)
                 }
