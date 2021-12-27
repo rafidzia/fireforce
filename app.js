@@ -199,6 +199,7 @@ io.on('connection', function (socket) {
                     records.push(tmpData)
                 }
             }
+            console.log(records);
             socket.emit("userDetailResult", records)
         })
 
