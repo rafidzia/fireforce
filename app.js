@@ -154,7 +154,7 @@ io.on('connection', function (socket) {
         db.collection("user").find({"id" : data.id, "token" : data.token}).toArray((err, result)=>{
             if(err) throw err;
             if(result.length == 0) return;
-            let result = result[0];
+            result = result[0];
             let records = []
             for(let key in result){
                 if(key.substring(0, 1) == "F"){
