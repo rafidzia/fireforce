@@ -73,7 +73,7 @@ ee.on("aedes_/FireSmokeDetected", (dataMap) => {
     })
 
     // io.emit("/user/FireSmokeDetected/" + data[0]);
-    fcm.send("/topics/FireSmokeDetected-" + data[1], {floor : data[2], room : data[3]}, (err, data)=>{
+    fcm.send("/topics/FireSmokeDetected-" + data[0], {floor : data[1], room : data[2]}, {title : "Ada Kebakaran!!", body : ""}, (err, data)=>{
         console.log(err, data)
     })
 })

@@ -10,8 +10,14 @@ fAdmin.initializeApp({
     credential: fAdmin.credential.cert(serviceAccount)
 })
 
-exports.send = (topicOrToken, data, callback = false)=>{
-    let payload = {data : data}
+exports.send = (topicOrToken, data = false, notification = false, callback = false)=>{
+    let payload = {};
+    if(data){
+        payload.data = data;
+    }
+    if(notification){
+        payload.notification = notification;
+    }
     let options = {
         priority: 'high',
         timeToLive: 60 * 60 * 24, // 1 day
