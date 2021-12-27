@@ -99,7 +99,7 @@ ee.on("aedes_/SmokeDetected", (dataMap) => {
     })
     ee.emit("detailChanged", {id : data[0]})
     // io.emit("/user/SmokeDetected/" + data[0]);
-    fcm.send("/topics/SmokeDetected-" + data[0], false, {"title" : "Terdeteksi Asap", "body" : "Lantai " + data[1] + " Ruang " + data[2]})
+    // fcm.send("/topics/SmokeDetected-" + data[0], false, {"title" : "Terdeteksi Asap", "body" : "Lantai " + data[1] + " Ruang " + data[2]})
 })
 
 ee.on("aedes_/FireDetected", (dataMap) => {
@@ -114,7 +114,7 @@ ee.on("aedes_/FireDetected", (dataMap) => {
     ee.emit("detailChanged", {id : data[0]})
     // io.emit("/user/FireDetected/" + data[0]);
 
-    fcm.send("/topics/FireDetected-" + data[0], false, {"title" : "Terdeteksi Api", "body" : "Lantai " + data[1] + " Ruang " + data[2]})
+    // fcm.send("/topics/FireDetected-" + data[0], false, {"title" : "Terdeteksi Api", "body" : "Lantai " + data[1] + " Ruang " + data[2]})
 })
 
 ee.on("aedes_/NoDetected", (dataMap) => {
