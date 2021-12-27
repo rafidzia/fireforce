@@ -219,6 +219,7 @@ io.on('connection', function (socket) {
                         }
                     }
                 }
+                console.log(records)
                 socket.emit("userSearchByFloorRoomResult", records)
             })
         })
