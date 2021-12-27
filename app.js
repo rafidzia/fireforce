@@ -63,7 +63,7 @@ app.get("/", (req, res) => {
 // {"floor" : data[1].substring(1, data[1].length - 1), "room" : result[data[1]][data[2]][1]}
 
 ee.on("aedes_/FireSmokeDetected", (dataMap) => {
-    let data = dataMap.split(";")             // contoh format data Long,Lat;C1;F1;R1 (Client 1 Floor 1 Room 1)
+    let data = dataMap.split(";")             // contoh format data C1;F1;R1 (Client 1 Floor 1 Room 1)
     let dataupdate = {}
     dataupdate.$set = {}
     dataupdate.$set[`${data[1]}.${data[2]}.0`] = 3
@@ -151,19 +151,33 @@ io.on('connection', function (socket) {
 
     socket.on("userRequestStatus", (data)=>{
         data.token = crypto.createHash('sha256').update(data.token).digest('hex');
-        db.collection(data.option).find({"id" : data.id, "token" : data.token}).toArray((err, result)=>{
+        db.collection("user").find({"id" : data.id, "token" : data.token}).toArray((err, result)=>{
             if(err) throw err;
             if(result.length == 0) return;
-            let data = result[0];
+            let result = result[0];
             let records = []
-            for(let key in data){
+            for(let key in result){
                 if(key.substring(0, 1) == "F"){
-                    for(let key1 in data[key]){
-                        records.push(data[key][key1][0])
+                    for(let key1 in result[key]){
+                        records.push(result[key][key1][0])
                     }
                 }
             }
             socket.emit("userStatusResult", records)
+        })
+    })
+
+    socket.on("firemanRequestStatus", (data)=>{
+        data.token = crypto.createHash('sha256').update(data.token).digest('hex');
+        db.collection("fireman").find({"id" : data.id, "token" : data.token}).toArray((err, result)=>{
+            if(err) throw err;
+            if(result.length == 0) return;
+            let result = result[0];
+            if(result.demand != "-"){
+                socket.emit("firemanStatusResult", {"status" : true})
+            }else{
+                socket.emit("firemanStatusResult", {"status" : false})
+            }
         })
     })
     
