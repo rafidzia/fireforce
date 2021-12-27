@@ -201,31 +201,30 @@ io.on('connection', function (socket) {
             }
             socket.emit("userDetailResult", records)
         })
+        // socket.
 
-        socket.on("userSearchByFloorRoom", (data)=>{
-            data.token = crypto.createHash('sha256').update(data.token).digest('hex');
-            db.collection("user").find({"id" : data.id, "token" : data.token}).toArray((err, result)=>{
-                if(err) throw err;
-                if(result.length == 0) return;
-                result = result[0];
-                let records = {};
-                for(let key in result){
-                    if(key == data.floor){
-                        records.floor = key.substring(1, key.length);   
-                        for(let key1 in result[key]){
-                            if(key1 == data.room){
-                                records.room = result[key][key1][1];
-                            }
+    })
+
+    socket.on("userSearchByFloorRoom", (data)=>{
+        data.token = crypto.createHash('sha256').update(data.token).digest('hex');
+        db.collection("user").find({"id" : data.id, "token" : data.token}).toArray((err, result)=>{
+            if(err) throw err;
+            if(result.length == 0) return;
+            result = result[0];
+            let records = {};
+            for(let key in result){
+                if(key == data.floor){
+                    records.floor = key.substring(1, key.length);   
+                    for(let key1 in result[key]){
+                        if(key1 == data.room){
+                            records.room = result[key][key1][1];
                         }
                     }
                 }
-                console.log(records)
-                socket.emit("userSearchByFloorRoomResult", records)
-            })
+            }
+            console.log(records)
+            socket.emit("userSearchByFloorRoomResult", records)
         })
-
-        // socket.
-
     })
 
 
