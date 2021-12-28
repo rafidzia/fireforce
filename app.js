@@ -98,6 +98,9 @@ ee.on("aedes_/SmokeDetected", (dataMap) => {
         io.emit("userConditionChange" + data[0]);
     })
     ee.emit("detailChanged", {id : data[0]})
+
+    ee.emit("setNotif", {"title" : "Terdeteksi Asap", "body" : "Lantai "+ data[1].substring(1, data[1].length) +" Ruang " + data[2]})
+
     // io.emit("/user/SmokeDetected/" + data[0]);
     // fcm.send("/topics/SmokeDetected-" + data[0], false, {"title" : "Terdeteksi Asap", "body" : "Lantai " + data[1] + " Ruang " + data[2]})
 })
@@ -113,6 +116,8 @@ ee.on("aedes_/FireDetected", (dataMap) => {
     })
     ee.emit("detailChanged", {id : data[0]})
     // io.emit("/user/FireDetected/" + data[0]);
+
+    ee.emit("setNotif", {"title" : "Terdeteksi Api", "body" : "Lantai "+ data[1].substring(1, data[1].length) +" Ruang " + data[2]})
 
     // fcm.send("/topics/FireDetected-" + data[0], false, {"title" : "Terdeteksi Api", "body" : "Lantai " + data[1] + " Ruang " + data[2]})
 })
@@ -132,6 +137,12 @@ ee.on("aedes_/NoDetected", (dataMap) => {
     // fcm.send("/topics/NoDetected-" + data[0], {floor : data[1], room : data[2]})
 })
 
+
+ee.on("setNotif", (notifData)=>{
+    fcm.send("/topics/notify", false, notifData, (err, data)=>{
+        console.log(err, data)
+    })
+})
 
 io.on('connection', function (socket) {
 
