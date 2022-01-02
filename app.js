@@ -101,10 +101,12 @@ ee.on("aedes_/FireSmokeDetected", (dataMap) => {
                 }
             }
             let choosedFireman = result1[minTimeDistance - 1]
-            console.log(choosedFireman)
 
-            fcm.send("/topics/FireSmokeDetected-T1", {place : result.name}, false, (err, data)=>{
-                console.log(err, data)
+            db.collection("fireman").updateOne({id : choosedFireman.id}, {$set : {demand : result.id}}, (err, result)=>{
+                if(err) throw err;
+                fcm.send("/topics/FireSmokeDetected-" + choosedFireman.id, {place : result.name}, false, (err, data)=>{
+                    console.log(err, data)
+                })
             })
         })
 
