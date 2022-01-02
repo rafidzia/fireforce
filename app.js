@@ -87,6 +87,7 @@ ee.on("aedes_/FireSmokeDetected", (dataMap) => {
             if(err) throw err;
 
             let tempData = []
+            tempData.push([result.longitude, result.latitude])
             for(let i = 0; i < result1.length; i++){
                 tempData.push([result1[i].longitude, result1[i].latitude])
             }
