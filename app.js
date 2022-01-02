@@ -21,6 +21,8 @@ const mongoOptions = {
 }
 var db;
 
+const axios = require('axios');
+
 var fcm = require("./fcm")
 
 MongoClient.connect(mongoURL, mongoOptions, (err, client)=>{
@@ -72,7 +74,7 @@ ee.on("aedes_/FireSmokeDetected", (dataMap) => {
         io.emit("userConditionChange" + data[0]);
     })
     ee.emit("detailChanged", {id : data[0]})
-    // io.emit("/user/FireSmokeDetected/" + data[0]);
+    
     fcm.send("/topics/FireSmokeDetected-" + data[0], {floor : data[1], room : data[2]}, false, (err, data)=>{
         console.log(err, data)
     })
@@ -81,9 +83,25 @@ ee.on("aedes_/FireSmokeDetected", (dataMap) => {
         if(err) throw err;
         if(!result.name) return;
         
-        fcm.send("/topics/FireSmokeDetected-T1", {place : result.name}, false, (err, data)=>{
-            console.log(err, data)
+        db.collection("fireman").find({}).toArray((err, result)=>{
+            if(err) throw err;
+
+            let tempData = []
+            for(let i = 0; i < result.length; i++){
+                tempData.push([result[i].longitude, result[i].latitude])
+            }
+            let distanceMatrix = await axios({method : "post", url : "https://api.openrouteservice.org/v2/matrix/driving-car", headers : {Authorization : "5b3ce3597851110001cf624877c75768e9d74eacb82464242d599887"}, data : {locations : tempData}})
+
+            console.log(distanceMatrix)
+
+            fcm.send("/topics/FireSmokeDetected-T1", {place : result.name}, false, (err, data)=>{
+                console.log(err, data)
+            })
         })
+
+        
+        
+        
         
     })
 })
@@ -99,7 +117,7 @@ ee.on("aedes_/SmokeDetected", (dataMap) => {
     })
     ee.emit("detailChanged", {id : data[0]})
 
-    ee.emit("setNotif", {"title" : "Terdeteksi Asap", "body" : "Lantai "+ data[1].substring(1, data[1].length) +" Ruang " + data[2]})
+    ee.emit("setNotif", data[0], {"title" : "Terdeteksi Asap", "body" : "Lantai "+ data[1].substring(1, data[1].length) +" Ruang " + data[2]})
 
     // io.emit("/user/SmokeDetected/" + data[0]);
     // fcm.send("/topics/SmokeDetected-" + data[0], false, {"title" : "Terdeteksi Asap", "body" : "Lantai " + data[1] + " Ruang " + data[2]})
@@ -117,7 +135,7 @@ ee.on("aedes_/FireDetected", (dataMap) => {
     ee.emit("detailChanged", {id : data[0]})
     // io.emit("/user/FireDetected/" + data[0]);
 
-    ee.emit("setNotif", {"title" : "Terdeteksi Api", "body" : "Lantai "+ data[1].substring(1, data[1].length) +" Ruang " + data[2]})
+    ee.emit("setNotif", data[0], {"title" : "Terdeteksi Api", "body" : "Lantai "+ data[1].substring(1, data[1].length) +" Ruang " + data[2]})
 
     // fcm.send("/topics/FireDetected-" + data[0], false, {"title" : "Terdeteksi Api", "body" : "Lantai " + data[1] + " Ruang " + data[2]})
 })
@@ -138,8 +156,8 @@ ee.on("aedes_/NoDetected", (dataMap) => {
 })
 
 
-ee.on("setNotif", (notifData)=>{
-    fcm.send("/topics/notify", false, notifData, (err, data)=>{
+ee.on("setNotif", (client, notifData)=>{
+    fcm.send("/topics/notify-" + client, false, notifData, (err, data)=>{
         console.log(err, data)
     })
 })
