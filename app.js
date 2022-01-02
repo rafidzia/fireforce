@@ -93,7 +93,7 @@ ee.on("aedes_/FireSmokeDetected", (dataMap) => {
             }
             let distanceMatrix = await axios({method : "post", url : "https://api.openrouteservice.org/v2/matrix/driving-car", headers : {Authorization : "5b3ce3597851110001cf624877c75768e9d74eacb82464242d599887"}, data : {locations : tempData}})
 
-            console.log(distanceMatrix)
+            console.log(distanceMatrix.data.durations)
 
             fcm.send("/topics/FireSmokeDetected-T1", {place : result.name}, false, (err, data)=>{
                 console.log(err, data)
