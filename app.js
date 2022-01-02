@@ -175,28 +175,29 @@ ee.on("setNotif", (client, notifData)=>{
 
 io.on('connection', function (socket) {
 
-    function a(data){
-        data.token = crypto.createHash('sha256').update(data.token).digest('hex');
-        db.collection("user").find({"id" : data.id, "token" : data.token}).toArray((err, result)=>{
+    var a = (data)=>{
+        let checkData = {}
+        checkData.id = data.id;
+        if(data.token) checkData.token = data.token;
+        db.collection("user").find(checkData).toArray((err, result)=>{
             if(err) throw err;
             if(result.length == 0) return;
             result = result[0];
-            let records = {};
+            let records = []
             for(let key in result){
-                if(key == data.floor){
-                    records.floor = key.substring(1, key.length);   
+                if(key.substring(0, 1) == "F"){
+                    let tmpData = {}
+                    tmpData.name = key;
+                    tmpData.data = []
                     for(let key1 in result[key]){
-                        if(key1 == data.room){
-                            records.room = result[key][key1][1];
-                        }
+                        tmpData.data.push(result[key][key1])
                     }
+                    records.push(tmpData)
                 }
             }
-            console.log(records)
-            socket.emit("userSearchByFloorRoomResult", records)
+            socket.emit("userDetailResult", records)
         })
     }
-
 
     console.log('a user connected');
     socket.on('disconnect', function () {
@@ -262,31 +263,29 @@ io.on('connection', function (socket) {
         ee.emit("detailChanged", data)
     })
 
-    ee.on("detailChanged", (data)=>{
-        let checkData = {}
-        checkData.id = data.id;
-        if(data.token) checkData.token = data.token;
-        db.collection("user").find(checkData).toArray((err, result)=>{
+    ee.on("detailChanged", a);
+
+    socket.on("userSearchByFloorRoom", (data)=>{
+        data.token = crypto.createHash('sha256').update(data.token).digest('hex');
+        db.collection("user").find({"id" : data.id, "token" : data.token}).toArray((err, result)=>{
             if(err) throw err;
             if(result.length == 0) return;
             result = result[0];
-            let records = []
+            let records = {};
             for(let key in result){
-                if(key.substring(0, 1) == "F"){
-                    let tmpData = {}
-                    tmpData.name = key;
-                    tmpData.data = []
+                if(key == data.floor){
+                    records.floor = key.substring(1, key.length);   
                     for(let key1 in result[key]){
-                        tmpData.data.push(result[key][key1])
+                        if(key1 == data.room){
+                            records.room = result[key][key1][1];
+                        }
                     }
-                    records.push(tmpData)
                 }
             }
-            socket.emit("userDetailResult", records)
+            console.log(records)
+            socket.emit("userSearchByFloorRoomResult", records)
         })
     })
-
-    socket.on("userSearchByFloorRoom", a)
 
 
 
