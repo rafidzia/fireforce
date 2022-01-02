@@ -83,12 +83,12 @@ ee.on("aedes_/FireSmokeDetected", (dataMap) => {
         if(err) throw err;
         if(!result.name) return;
         
-        db.collection("fireman").find({}).toArray(async (err, result)=>{
+        db.collection("fireman").find({}).toArray(async (err, result1)=>{
             if(err) throw err;
 
             let tempData = []
-            for(let i = 0; i < result.length; i++){
-                tempData.push([result[i].longitude, result[i].latitude])
+            for(let i = 0; i < result1.length; i++){
+                tempData.push([result1[i].longitude, result1[i].latitude])
             }
             let distanceMatrix = await axios({method : "post", url : "https://api.openrouteservice.org/v2/matrix/driving-car", headers : {Authorization : "5b3ce3597851110001cf624877c75768e9d74eacb82464242d599887"}, data : {locations : tempData}})
 
