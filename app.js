@@ -83,7 +83,7 @@ ee.on("aedes_/FireSmokeDetected", (dataMap) => {
         if(err) throw err;
         if(!result.name) return;
         
-        db.collection("fireman").find({}).toArray((err, result)=>{
+        db.collection("fireman").find({}).toArray(async (err, result)=>{
             if(err) throw err;
 
             let tempData = []
