@@ -110,10 +110,6 @@ ee.on("aedes_/FireSmokeDetected", (dataMap) => {
             })
         })
 
-        
-        
-        
-        
     })
 })
 
@@ -126,7 +122,7 @@ ee.on("aedes_/SmokeDetected", (dataMap) => {
         if(err) throw err;
         io.emit("userConditionChange" + data[0]);
     })
-    ee.emit("detailChanged", {id : data[0]})
+    ee.emit("detailChanged", data[0])
 
     ee.emit("setNotif", data[0], {"title" : "Terdeteksi Asap", "body" : "Lantai "+ data[1].substring(1, data[1].length) +" Ruang " + data[2]})
 
@@ -143,7 +139,7 @@ ee.on("aedes_/FireDetected", (dataMap) => {
         if(err) throw err;
         io.emit("userConditionChange" + data[0]);
     })
-    ee.emit("detailChanged", {id : data[0]})
+    ee.emit("detailChanged", data[0])
     // io.emit("/user/FireDetected/" + data[0]);
 
     ee.emit("setNotif", data[0], {"title" : "Terdeteksi Api", "body" : "Lantai "+ data[1].substring(1, data[1].length) +" Ruang " + data[2]})
@@ -160,7 +156,8 @@ ee.on("aedes_/NoDetected", (dataMap) => {
         if(err) throw err;
         io.emit("userConditionChange" + data[0]);
     })
-    ee.emit("detailChanged", {id : data[0]})
+    ee.emit("detailChanged", data[0])
+    
     // io.emit("/user/NoDetected/" + data[0]);
     
     // fcm.send("/topics/NoDetected-" + data[0], {floor : data[1], room : data[2]})
@@ -173,35 +170,33 @@ ee.on("setNotif", (client, notifData)=>{
     })
 })
 
+ee.on("detailChanged", (id)=>{
+    db.collection("user").findOne({id : id}, (err, result)=>{
+        if(err) throw err;
+        if(!result.id) return;
+        let records = []
+        for(let key in result){
+            if(key.substring(0, 1) == "F"){
+                let tmpData = {}
+                tmpData.name = key;
+                tmpData.data = []
+                for(let key1 in result[key]){
+                    tmpData.data.push(result[key][key1])
+                }
+                records.push(tmpData)
+            }
+        }
+        io.emit("userDetailResult-" + id, records)
+    })
+})
+
 io.on('connection', function (socket) {
 
-    var a = (data)=>{
-        let checkData = {}
-        checkData.id = data.id;
-        if(data.token) checkData.token = data.token;
-        db.collection("user").find(checkData).toArray((err, result)=>{
-            if(err) throw err;
-            if(result.length == 0) return;
-            result = result[0];
-            let records = []
-            for(let key in result){
-                if(key.substring(0, 1) == "F"){
-                    let tmpData = {}
-                    tmpData.name = key;
-                    tmpData.data = []
-                    for(let key1 in result[key]){
-                        tmpData.data.push(result[key][key1])
-                    }
-                    records.push(tmpData)
-                }
-            }
-            socket.emit("userDetailResult", records)
-        })
-    }
+    // var a = 
 
     console.log('a user connected');
     socket.on('disconnect', function () {
-        ee.removeListener("detailChanged", a)
+        // ee.removeListener("detailChanged", a)
         console.log('user disconnected');
     });
 
@@ -260,10 +255,32 @@ io.on('connection', function (socket) {
     
     socket.on("userRequestDetail", (data)=>{
         data.token = crypto.createHash('sha256').update(data.token).digest('hex');
-        ee.emit("detailChanged", data)
+        db.collection("user").find({id : data.id, token : data.token}).toArray((err, result)=>{
+            if(err) throw err;
+            if(result.length == 0) return;
+            result = result[0];
+            let records = []
+            for(let key in result){
+                if(key.substring(0, 1) == "F"){
+                    let tmpData = {}
+                    tmpData.name = key;
+                    tmpData.data = []
+                    for(let key1 in result[key]){
+                        tmpData.data.push(result[key][key1])
+                    }
+                    records.push(tmpData)
+                }
+            }
+            socket.emit("userDetailResult-" + data.id, records)
+        })
     })
 
-    ee.on("detailChanged", a);
+    // ee.on("detailChanged", (data)=>{
+    //     let checkData = {}
+    //     checkData.id = data.id;
+    //     if(data.token) checkData.token = data.token;
+        
+    // });
 
     socket.on("userSearchByFloorRoom", (data)=>{
         data.token = crypto.createHash('sha256').update(data.token).digest('hex');
