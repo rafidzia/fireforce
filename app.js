@@ -171,9 +171,10 @@ ee.on("setNotif", (client, notifData)=>{
 })
 
 ee.on("detailChanged", (id)=>{
-    db.collection("user").findOne({id : id}, (err, result)=>{
+    db.collection("user").find({id : id}).toArray((err, result)=>{
         if(err) throw err;
-        if(!result.id) return;
+        if(result.length == 0) return;
+        result = result[0];
         let records = []
         for(let key in result){
             if(key.substring(0, 1) == "F"){
