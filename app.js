@@ -22,6 +22,7 @@ const mongoOptions = {
 var db;
 
 const axios = require('axios');
+const settings = require('./settings.json')
 
 var fcm = require("./fcm")
 
@@ -91,7 +92,7 @@ ee.on("aedes_/FireSmokeDetected", (dataMap) => {
             for(let i = 0; i < result1.length; i++){
                 tempData.push([result1[i].longitude, result1[i].latitude])
             }
-            let distanceMatrix = await axios({method : "post", url : "https://api.openrouteservice.org/v2/matrix/driving-car", headers : {Authorization : "5b3ce3597851110001cf624877c75768e9d74eacb82464242d599887"}, data : {locations : tempData}})
+            let distanceMatrix = await axios({method : "post", url : "https://api.openrouteservice.org/v2/matrix/driving-car", headers : {Authorization : settings.token}, data : {locations : tempData}})
 
             let timeDistanceAll = distanceMatrix.data.durations[0]
             let minTimeDistance = 1;
