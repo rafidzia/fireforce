@@ -127,7 +127,7 @@ ee.on("aedes_/SmokeDetected", (dataMap) => {
     db.collection("user").find({id : data[0]}).toArray((err, result)=>{
         if(err) throw err;
         if(result.length == 0) return;
-        ee.emit("setNotif", data[0], {"title" : "Terdeteksi Asap", "body" : "Lantai "+ data[1].substring(1, data[1].length) +" Ruang " + result[0][data[1]][data[2]][1]})
+        ee.emit("setNotif", data[0], {"title" : "Terdeteksi Asap", "body" : "Lantai "+ data[1].substring(1, data[1].length) +" Ruang '" + result[0][data[1]][data[2]][1] + "'"})
     })
 
     // io.emit("/user/SmokeDetected/" + data[0]);
@@ -148,7 +148,7 @@ ee.on("aedes_/FireDetected", (dataMap) => {
     db.collection("user").find({id : data[0]}).toArray((err, result)=>{
         if(err) throw err;
         if(result.length == 0) return;
-        ee.emit("setNotif", data[0], {"title" : "Terdeteksi Api", "body" : "Lantai "+ data[1].substring(1, data[1].length) +" Ruang " + result[0][data[1]][data[2]][1]})
+        ee.emit("setNotif", data[0], {"title" : "Terdeteksi Api", "body" : "Lantai "+ data[1].substring(1, data[1].length) +" Ruang '" + result[0][data[1]][data[2]][1] + "'"})
     })
     
 
