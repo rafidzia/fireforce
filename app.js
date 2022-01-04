@@ -314,6 +314,28 @@ io.on('connection', function (socket) {
         })
     })
 
+    socket.on("userRequestFireman", (data)=>{
+
+    })
+
+    socket.on("firemanRequestClient", (data)=>{
+        db.collection("fireman").find({"id" : data.id, "token" : data.token}).toArray((err, result)=>{
+            if(err) throw err;
+            if(result.length == 0) return;
+            result = result[0];
+            db.collection("user").find({"id" : result.demand}).toArray((err, result1)=>{
+                if(err) throw err;
+                if(result1.length == 0) return;
+                result1 = result1[0];
+                socket.emit("firemanResultClient", {"name" : result1.name, "address" : result1.address})
+            })
+        })
+    })
+
+    socket.on("firemanStreamLocation", (data)=>{
+        console.log(data);
+    })
+
 
 
     socket.on("dsa", (data)=>{
