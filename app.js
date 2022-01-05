@@ -346,8 +346,6 @@ io.on('connection', function (socket) {
                 let directionsGeoJSON = await axios({method : "post", url : "https://api.openrouteservice.org/v2/directions/driving-car/geojson", headers : {Authorization : settings.token}, data : {coordinates  : [[data.longitude, data.latitude],[result1.longitude, result1.latitude]]}})
                 let duration = directionsGeoJSON.data.features[0].properties.summary.duration;
                 let coordinates = directionsGeoJSON.data.features[0].geometry.coordinates;
-
-                console.log({duration : duration, coordinates : coordinates})
                 
                 io.emit("firemanStreamLocationResult-" + result1.id, {duration : duration, coordinates : coordinates})
                 socket.emit("firemanStreamLocationResult", {duration : duration, coordinates : coordinates})
