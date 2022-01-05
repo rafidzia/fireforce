@@ -309,13 +309,27 @@ io.on('connection', function (socket) {
                     }
                 }
             }
-            console.log(records)
+            
             socket.emit("userSearchByFloorRoomResult", records)
         })
     })
 
     socket.on("userRequestFireman", (data)=>{
-
+        data.token = crypto.createHash('sha256').update(data.token).digest('hex');
+        db.collection("user").find({"id" : data.id, "token" : data.token}).toArray((err, result)=>{
+            if(err) throw err;
+            if(result.length == 0) return;
+            result = result[0];
+            db.collection("fireman").find({demand : result.id}).toArray((err, result1)=>{
+                if(err) throw err;
+                if(result1.length == 0){
+                    socket.emit("userFiremanDone")
+                    return;
+                }
+                result1 = result1[0];
+                socket.emit("userResultFireman", {name : result1.name})
+            })
+        })
     })
 
     socket.on("firemanRequestClient", (data)=>{
@@ -347,8 +361,6 @@ io.on('connection', function (socket) {
                 let duration = directionsGeoJSON.data.features[0].properties.summary.duration;
                 let distance = directionsGeoJSON.data.features[0].properties.summary.distance;
                 let coordinates = directionsGeoJSON.data.features[0].geometry.coordinates;
-                console.log("----------------")
-                console.log("asd")
                 
                 io.emit("firemanStreamLocationResult-" + result1.id, {duration : duration, distance : distance, coordinates : coordinates})
                 socket.emit("firemanStreamLocationResult", {duration : duration, distance : distance, coordinates : coordinates})
