@@ -337,16 +337,10 @@ io.on('connection', function (socket) {
     })
 
     socket.on("firemanFireExtinguished", (data)=>{
-        db.collection("fireman").find({id : data.id, token : data.token}).toArray((err, result)=>{
+        db.collection("fireman").updateOne({id : data.id, token : data.token, demand : result.demand}, {$set : {"demand" : "-"}}, (err, result1)=>{
             if(err) throw err;
-            if(result.length == 0) return;
-            result = result[0];
-            // db.collection("user").updateOne({"id" : result.demand}, {$set : {}}, (err, result1)=>{
-            db.collection("fireman").updateOne({id : result.demand}, {$set : {"demand" : "-"}}, (err, result1)=>{
-                if(err) throw err;
-                console.log(result1)
-                socket.emit("firemanFireExtinguishedResult")
-            })
+            console.log(result1)
+            socket.emit("firemanFireExtinguishedResult")
         })
     })
 
