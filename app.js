@@ -347,6 +347,8 @@ io.on('connection', function (socket) {
                 let duration = directionsGeoJSON.data.features[0].properties.summary.duration;
                 let distance = directionsGeoJSON.data.features[0].properties.summary.distance;
                 let coordinates = directionsGeoJSON.data.features[0].geometry.coordinates;
+                console.log("----------------")
+                console.log("asd")
                 
                 io.emit("firemanStreamLocationResult-" + result1.id, {duration : duration, distance : distance, coordinates : coordinates})
                 socket.emit("firemanStreamLocationResult", {duration : duration, distance : distance, coordinates : coordinates})
