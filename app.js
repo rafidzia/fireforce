@@ -339,9 +339,9 @@ io.on('connection', function (socket) {
 
     socket.on("firemanFireExtinguished", (data)=>{
         data.token = crypto.createHash('sha256').update(data.token).digest('hex');
-        db.collection("fireman").updateOne({id : data.id, token : data.token}, {$set : {"demand" : "-"}}, (err, result1)=>{
+        console.log(data)
+        db.collection("fireman").updateOne({id : data.id, token : data.token}, {$set : {demand : "-"}}, (err, result1)=>{
             if(err) throw err;
-            console.log(result1)
             socket.emit("firemanFireExtinguishedResult")
         })
     })
