@@ -337,7 +337,7 @@ io.on('connection', function (socket) {
     })
 
     socket.on("firemanFireExtinguished", (data)=>{
-        db.collection("fireman").updateOne({id : data.id, token : data.token, demand : result.demand}, {$set : {"demand" : "-"}}, (err, result1)=>{
+        db.collection("fireman").updateOne({id : data.id, token : data.token}, {$set : {"demand" : "-"}}, (err, result1)=>{
             if(err) throw err;
             console.log(result1)
             socket.emit("firemanFireExtinguishedResult")
