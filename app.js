@@ -84,7 +84,7 @@ ee.on("aedes_/FireSmokeDetected", (dataMap) => {
         if(err) throw err;
         if(!result.name) return;
         
-        db.collection("fireman").find({}).toArray(async (err, result1)=>{
+        db.collection("fireman").find({demand : "-"}).toArray(async (err, result1)=>{
             if(err) throw err;
 
             let tempData = []
@@ -334,6 +334,7 @@ io.on('connection', function (socket) {
     })
 
     socket.on("firemanStreamLocation", (data)=>{
+
         console.log(data);
     })
 
