@@ -319,6 +319,7 @@ io.on('connection', function (socket) {
     })
 
     socket.on("firemanRequestClient", (data)=>{
+        data.token = crypto.createHash('sha256').update(data.token).digest('hex');
         db.collection("fireman").find({id : data.id, token : data.token}).toArray((err, result)=>{
             if(err) throw err;
             if(result.length == 0) return;
@@ -337,6 +338,7 @@ io.on('connection', function (socket) {
     })
 
     socket.on("firemanFireExtinguished", (data)=>{
+        data.token = crypto.createHash('sha256').update(data.token).digest('hex');
         db.collection("fireman").updateOne({id : data.id, token : data.token}, {$set : {"demand" : "-"}}, (err, result1)=>{
             if(err) throw err;
             console.log(result1)
