@@ -344,10 +344,8 @@ io.on('connection', function (socket) {
                 if(result1.length == 0) return;
                 result1 = result1[0];
                 let directionsGeoJSON = await axios({method : "post", url : "https://api.openrouteservice.org/v2/directions/driving-car/geojson", headers : {Authorization : settings.token}, data : {coordinates  : [[data.longitude, data.latitude],[result1.longitude, result1.latitude]]}})
-                console.log(directionsGeoJSON.features)
-                console.log(directionsGeoJSON.data.features)
-                let duration = directionsGeoJSON.features[0].properties.summary.duration;
-                let coordinates = directionsGeoJSON.features[0].geometry.coordinates;
+                let duration = directionsGeoJSON.data.features[0].properties.summary.duration;
+                let coordinates = directionsGeoJSON.data.features[0].geometry.coordinates;
 
                 console.log({duration : duration, coordinates : coordinates})
                 
