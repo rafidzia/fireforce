@@ -339,13 +339,11 @@ io.on('connection', function (socket) {
             if(err) throw err;
             if(result.length == 0) return;
             result = result[0];
-            let tempData = [[data.longitude, data.latitude]];
             db.collection("user").find({"id" : result.demand}).toArray(async (err, result1)=>{
                 if(err) throw err;
                 if(result1.length == 0) return;
                 result1 = result1[0];
-                tempData.push([result1.longitude, result1.latitude])
-                let directionsGeoJSON = await axios({method : "post", url : "https://api.openrouteservice.org/v2/directions/driving-car/geojson", headers : {Authorization : settings.token}, data : {coordinates  : tempData}})
+                let directionsGeoJSON = await axios({method : "post", url : "https://api.openrouteservice.org/v2/directions/driving-car/geojson", headers : {Authorization : settings.token}, data : {coordinates  : [[data.longitude, data.latitude],[result1.longitude, result1.latitude]]}})
                 let duration = directionsGeoJSON.features[0].properties.summary.duration;
                 let coordinates = directionsGeoJSON.features[0].geometry.coordinates;
 
