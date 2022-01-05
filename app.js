@@ -334,27 +334,26 @@ io.on('connection', function (socket) {
     })
 
     socket.on("firemanStreamLocation", (data)=>{
-        console.log(data)
-        // data.token = crypto.createHash('sha256').update(data.token).digest('hex');
-        // db.collection("fireman").find({id : data.id, token : data.token}).toArray((err, result)=>{
-        //     if(err) throw err;
-        //     if(result.length == 0) return;
-        //     result = result[0];
-        //     db.collection("user").find({"id" : result.demand}).toArray(async (err, result1)=>{
-        //         if(err) throw err;
-        //         if(result1.length == 0) return;
-        //         result1 = result1[0];
-        //         let directionsGeoJSON = await axios({method : "post", url : "https://api.openrouteservice.org/v2/directions/driving-car/geojson", headers : {Authorization : settings.token}, data : {coordinates  : [[data.longitude, data.latitude],[result1.longitude, result1.latitude]]}})
-        //         let duration = directionsGeoJSON.features[0].properties.summary.duration;
-        //         let coordinates = directionsGeoJSON.features[0].geometry.coordinates;
+        data.token = crypto.createHash('sha256').update(data.token).digest('hex');
+        db.collection("fireman").find({id : data.id, token : data.token}).toArray((err, result)=>{
+            if(err) throw err;
+            if(result.length == 0) return;
+            result = result[0];
+            db.collection("user").find({"id" : result.demand}).toArray(async (err, result1)=>{
+                if(err) throw err;
+                if(result1.length == 0) return;
+                result1 = result1[0];
+                let directionsGeoJSON = await axios({method : "post", url : "https://api.openrouteservice.org/v2/directions/driving-car/geojson", headers : {Authorization : settings.token}, data : {coordinates  : [[data.longitude, data.latitude],[result1.longitude, result1.latitude]]}})
+                let duration = directionsGeoJSON.features[0].properties.summary.duration;
+                let coordinates = directionsGeoJSON.features[0].geometry.coordinates;
 
-        //         console.log({duration : duration, coordinates : coordinates})
+                console.log({duration : duration, coordinates : coordinates})
                 
-        //         io.emit("firemanStreamLocationResult-" + result1.id, {duration : duration, coordinates : coordinates})
-        //         socket.emit("firemanStreamLocationResult", {duration : duration, coordinates : coordinates})
+                io.emit("firemanStreamLocationResult-" + result1.id, {duration : duration, coordinates : coordinates})
+                socket.emit("firemanStreamLocationResult", {duration : duration, coordinates : coordinates})
             
-        //     })
-        // })
+            })
+        })
     })
 
     socket.on("firemanFireExtinguished", (data)=>{
