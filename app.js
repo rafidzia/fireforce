@@ -371,11 +371,24 @@ io.on('connection', function (socket) {
 
     socket.on("firemanFireExtinguished", (data)=>{
         data.token = crypto.createHash('sha256').update(data.token).digest('hex');
-        console.log(data)
         db.collection("fireman").updateOne({id : data.id, token : data.token}, {$set : {demand : "-"}}, (err, result1)=>{
             if(err) throw err;
             socket.emit("firemanFireExtinguishedResult")
         })
+    })
+
+    socket.on("userFireExtinguished", (data)=>{
+        data.token = crypto.createHash('sha256').update(data.token).digest('hex');
+        db.collection("user").find({"id" : data.id, "token" : data.token}).toArray((err, result)=>{
+            if(err) throw err;
+            if(result.length == 0) return;
+            result = result[0];
+            db.collection("fireman").updateOne({demand : result.id}, {$set : {demand : "-"}}, (err, result1)=>{
+                if(err) throw err;
+                socket.emit("firemanFireExtinguishedResult")
+            })
+        })
+        
     })
 
 
