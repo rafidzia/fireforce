@@ -83,34 +83,37 @@ ee.on("aedes_/FireSmokeDetected", (dataMap) => {
     db.collection("user").findOne({id : data[0]}, (err, result)=>{
         if(err) throw err;
         if(!result.name) return;
-        
-        db.collection("fireman").find({demand : "-"}).toArray(async (err, result1)=>{
+
+        db.collection("fireman").find({demand : result.id}).toArray((err, result0)=>{
             if(err) throw err;
-
-            let tempData = []
-            tempData.push([result.longitude, result.latitude])
-            for(let i = 0; i < result1.length; i++){
-                tempData.push([result1[i].longitude, result1[i].latitude])
-            }
-            let distanceMatrix = await axios({method : "post", url : "https://api.openrouteservice.org/v2/matrix/driving-car", headers : {Authorization : settings.token}, data : {locations : tempData}})
-
-            let timeDistanceAll = distanceMatrix.data.durations
-            let minTimeDistance = 1;
-            for(let i = 1; i < timeDistanceAll.length; i++){
-                if(timeDistanceAll[i][0] < timeDistanceAll[minTimeDistance][0]){
-                    minTimeDistance = i;
-                }
-            }
-            let choosedFireman = result1[minTimeDistance - 1]
-
-            db.collection("fireman").updateOne({id : choosedFireman.id}, {$set : {demand : result.id}}, (err, result2)=>{
+            if(result0.length > 0) return;
+            db.collection("fireman").find({demand : "-"}).toArray(async (err, result1)=>{
                 if(err) throw err;
-                fcm.send("/topics/FireSmokeDetected-" + choosedFireman.id, {place : result.name}, false, (err, data)=>{
-                    console.log(err, data)
+    
+                let tempData = []
+                tempData.push([result.longitude, result.latitude])
+                for(let i = 0; i < result1.length; i++){
+                    tempData.push([result1[i].longitude, result1[i].latitude])
+                }
+                let distanceMatrix = await axios({method : "post", url : "https://api.openrouteservice.org/v2/matrix/driving-car", headers : {Authorization : settings.token}, data : {locations : tempData}})
+    
+                let timeDistanceAll = distanceMatrix.data.durations
+                let minTimeDistance = 1;
+                for(let i = 1; i < timeDistanceAll.length; i++){
+                    if(timeDistanceAll[i][0] < timeDistanceAll[minTimeDistance][0]){
+                        minTimeDistance = i;
+                    }
+                }
+                let choosedFireman = result1[minTimeDistance - 1]
+    
+                db.collection("fireman").updateOne({id : choosedFireman.id}, {$set : {demand : result.id}}, (err, result2)=>{
+                    if(err) throw err;
+                    fcm.send("/topics/FireSmokeDetected-" + choosedFireman.id, {place : result.name}, false, (err, data)=>{
+                        console.log(err, data)
+                    })
                 })
             })
         })
-
     })
 })
 
